@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a2c6b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>BCI Jobs</title>
+<style>
+  :root { --navy:#0a2c6b; --navy2:#0033a0; --amber:#c25e00; --amberbg:#fdecd8;
+          --green:#0a7d3c; --greenbg:#e4f4ea; --ink:#1a2233; --muted:#6b7684;
+          --line:#e5e8ef; --bg:#f6f8fb; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  .wrap { max-width:560px; margin:0 auto; }
+  header { background:#fff; padding:20px 20px 0; display:flex; justify-content:space-between; align-items:flex-start; }
+  header h1 { margin:0; color:var(--navy); font-size:29px; font-weight:800; }
+  header .sub { color:var(--muted); font-size:14px; margin:2px 0 16px; }
+  .refresh { background:#eef1fb; color:var(--navy2); border:none; border-radius:22px;
+             padding:9px 16px; font-size:15px; font-weight:700; cursor:pointer; white-space:nowrap; }
+  .tabs { display:flex; gap:22px; border-bottom:1px solid var(--line); padding:0 20px; background:#fff; position:sticky; top:0; z-index:5; }
+  .tab { padding:12px 0 10px; font-size:16px; color:var(--muted); font-weight:600; background:none; border:none; border-bottom:3px solid transparent; cursor:pointer; }
+  .tab.active { color:var(--navy); border-color:var(--navy); }
+  .badge { background:var(--navy); color:#fff; border-radius:20px; padding:1px 9px; font-size:13px; margin-left:6px; }
+  .panel { display:none; padding:16px 16px 48px; }
+  .panel.active { display:block; }
+  .install { display:none; background:#eef4ff; border:1px solid #d6e2ff; border-radius:12px; padding:12px 14px; margin-bottom:14px; align-items:center; justify-content:space-between; }
+  .install b { font-weight:600; }
+  .install button { background:var(--navy2); color:#fff; border:none; border-radius:8px; padding:8px 16px; font-weight:700; cursor:pointer; }
+  .status { background:#fff; border:1px solid var(--line); border-radius:12px; padding:13px 15px; color:var(--muted); font-size:14px; margin-bottom:14px; }
+  .status b { color:var(--ink); }
+  .stats { display:flex; gap:12px; margin-bottom:14px; }
+  .stat { flex:1; background:#fff; border:1px solid var(--line); border-radius:14px; padding:18px; text-align:center; }
+  .stat .n { font-size:34px; font-weight:800; color:var(--navy); }
+  .stat .l { font-size:13px; color:var(--muted); }
+  .job { background:#fff; border:1px solid var(--line); border-left:4px solid var(--navy); border-radius:12px; padding:15px; margin-bottom:12px; }
+  .job h3 { margin:0 0 4px; font-size:18px; }
+  .dept { color:var(--muted); font-size:13px; margin-bottom:9px; }
+  .meta { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+  .chip { background:#eef1f6; color:#48505e; border-radius:16px; padding:4px 11px; font-size:13px; }
+  .chip.hot { background:var(--amberbg); color:var(--amber); font-weight:600; }
+  .chip.rem { background:var(--greenbg); color:var(--green); }
+  .link { color:var(--navy2); font-weight:700; text-decoration:none; font-size:15px; }
+  .empty { color:var(--muted); text-align:center; padding:30px; }
+  .sec { color:var(--muted); font-size:12px; letter-spacing:.06em; font-weight:700; margin:22px 4px 10px; }
+  .kw { display:inline-block; border:1px solid var(--line); background:#fff; border-radius:18px; padding:6px 13px; margin:0 6px 8px 0; font-size:14px; }
+  .how { background:#fff; border:1px solid var(--line); border-radius:12px; padding:15px; font-size:14px; line-height:1.5; color:#333; }
+  .search { width:100%; padding:13px 16px; border:1px solid var(--line); border-radius:14px; font-size:16px; margin-bottom:12px; }
+</style></head>
+<body><div class="wrap">
+  <header>
+    <div><h1>BCI Jobs</h1><div class="sub">Seguimiento personalizado · Mario Bustos</div></div>
+    <button class="refresh" onclick="location.reload()">🔄 Actualizar</button>
+  </header>
+  <div class="tabs">
+    <button class="tab active" onclick="go(0)">Para ti <span class="badge">2</span></button>
+    <button class="tab" onclick="go(1)">Todas <span class="badge">4</span></button>
+    <button class="tab" onclick="go(2)">Mi perfil</button>
+  </div>
+
+  <div class="panel active">
+    <div class="install" id="ins"><span>📲 <b>Agrégala a tu pantalla de inicio</b></span><button id="insBtn">Instalar</button></div>
+    <div class="status">● <b>4 cargos cargados</b> · 22-07-2026, 01:13 pm</div>
+    <div class="stats">
+      <div class="stat"><div class="n">2</div><div class="l">Calzan con tu perfil</div></div>
+      <div class="stat"><div class="n">4</div><div class="l">Publicadas ≤7 días</div></div>
+    </div>
+    
+      <div class="job">
+        <h3>Ingeniero Dominio CRM</h3><div class="dept">Datos e Inteligencia Clientes</div>
+        <div class="meta"><span class="chip">📍 Las Condes</span><span class="chip">1 día</span><span class="chip hot">🔥 Reciente</span><span class="chip rem">🏠 3 días remotos</span></div>
+        <a class="link" href="https://trabajaenbci.cl/offers/113198" target="_blank" rel="noopener">Ver oferta ↗</a>
+      </div>
+      <div class="job">
+        <h3>Technical Lead Senior</h3><div class="dept">Gerencia de Operaciones y Tecnología</div>
+        <div class="meta"><span class="chip">📍 Las Condes</span><span class="chip">1 día</span><span class="chip hot">🔥 Reciente</span><span class="chip rem">🏠 4 días remotos</span></div>
+        <a class="link" href="https://trabajaenbci.cl/offers/113191" target="_blank" rel="noopener">Ver oferta ↗</a>
+      </div>
+  </div>
+
+  <div class="panel">
+    <input class="search" id="q" placeholder="Buscar cargo o ciudad..." oninput="filtrar()">
+    <div id="all">
+      <div class="job">
+        <h3>Ejecutivo/a Premier - Apoquindo</h3><div class="dept">Banca Retail</div>
+        <div class="meta"><span class="chip">📍 Las Condes</span><span class="chip">1 día</span><span class="chip hot">🔥 Reciente</span></div>
+        <a class="link" href="https://trabajaenbci.cl/offers/113217" target="_blank" rel="noopener">Ver oferta ↗</a>
+      </div>
+      <div class="job">
+        <h3>Ingeniero Dominio CRM</h3><div class="dept">Datos e Inteligencia Clientes</div>
+        <div class="meta"><span class="chip">📍 Las Condes</span><span class="chip">1 día</span><span class="chip hot">🔥 Reciente</span><span class="chip rem">🏠 3 días remotos</span></div>
+        <a class="link" href="https://trabajaenbci.cl/offers/113198" target="_blank" rel="noopener">Ver oferta ↗</a>
+      </div>
+      <div class="job">
+        <h3>Especialista Integración Pleno</h3><div class="dept">Gerencia de Operaciones y Tecnología</div>
+        <div class="meta"><span class="chip">📍 Las Condes</span><span class="chip">1 día</span><span class="chip hot">🔥 Reciente</span><span class="chip rem">🏠 4 días remotos</span></div>
+        <a class="link" href="https://trabajaenbci.cl/offers/113194" target="_blank" rel="noopener">Ver oferta ↗</a>
+      </div>
+      <div class="job">
+        <h3>Technical Lead Senior</h3><div class="dept">Gerencia de Operaciones y Tecnología</div>
+        <div class="meta"><span class="chip">📍 Las Condes</span><span class="chip">1 día</span><span class="chip hot">🔥 Reciente</span><span class="chip rem">🏠 4 días remotos</span></div>
+        <a class="link" href="https://trabajaenbci.cl/offers/113191" target="_blank" rel="noopener">Ver oferta ↗</a>
+      </div></div>
+  </div>
+
+  <div class="panel">
+    <div class="sec">ÚLTIMA ACTUALIZACIÓN</div>
+    <div class="status">22-07-2026, 01:13 pm · fuente: sitio oficial trabajaenbci.cl</div>
+    <div class="sec">PALABRAS CLAVE ACTIVAS</div>
+    <div><span class="kw">voz</span><span class="kw">voip</span><span class="kw">sip</span><span class="kw">carrier</span><span class="kw">wholesale</span><span class="kw">noc</span><span class="kw">redes</span><span class="kw">network</span><span class="kw">telecom</span><span class="kw">infraestructura</span><span class="kw">implementacion</span><span class="kw">implementación</span><span class="kw">core</span><span class="kw">ops</span><span class="kw">pbx</span><span class="kw">trunk</span><span class="kw">interconexion</span><span class="kw">interconexión</span><span class="kw">numeracion</span><span class="kw">numeración</span><span class="kw">ingenieria</span><span class="kw">ingeniería</span><span class="kw">sistemas</span><span class="kw">routing</span><span class="kw">fibra</span><span class="kw">soporte tecnico</span><span class="kw">soporte técnico</span></div>
+    <div class="sec">ÁREAS OBJETIVO</div>
+    <div><span class="kw">Carrier wholesale</span><span class="kw">VoIP / SIP</span><span class="kw">NOC</span><span class="kw">Redes / Network</span><span class="kw">Implementación</span><span class="kw">Infraestructura TI</span><span class="kw">Core voz</span><span class="kw">Ops fijo / móvil</span></div>
+    <div class="sec">CÓMO FUNCIONA</div>
+    <div class="how">Un proceso automático consulta el portal oficial de <b>trabajaenbci.cl</b>,
+    filtra por tu perfil de palabras clave y publica esta app. Cuando no hay conexión,
+    muestra los datos guardados de la última consulta (caché offline).</div>
+  </div>
+</div>
+<script>
+  function go(i){
+    document.querySelectorAll('.tab').forEach((t,n)=>t.classList.toggle('active',n===i));
+    document.querySelectorAll('.panel').forEach((p,n)=>p.classList.toggle('active',n===i));
+    window.scrollTo(0,0);
+  }
+  function filtrar(){
+    var q=document.getElementById('q').value.toLowerCase();
+    document.querySelectorAll('#all .job').forEach(function(c){
+      c.style.display = c.innerText.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+  let deferred;
+  window.addEventListener('beforeinstallprompt',function(e){
+    e.preventDefault(); deferred=e; document.getElementById('ins').style.display='flex';
+  });
+  document.getElementById('insBtn').onclick=function(){ if(deferred){deferred.prompt();deferred=null;document.getElementById('ins').style.display='none';} };
+  if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+</script>
+</body></html>
