@@ -26,8 +26,14 @@ import re
 import sys
 import json
 import html
+import http.client
 import urllib.parse
 from datetime import datetime
+
+# El portal de Bci devuelve muchas cabeceras (cookies de consentimiento,
+# seguridad, etc.). Python corta la conexión al pasar de 100 cabeceras
+# ("got more than 100 headers"); subimos el límite para evitarlo.
+http.client._MAXHEADERS = 1000
 
 try:
     import requests
