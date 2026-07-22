@@ -48,17 +48,45 @@ API = f"{BASE}/api/v3/bci_portals/_search"
 QUERY = {"query": {"match_all": {}}, "size": 100}   # trae todas (hay ~36)
 UA = "Mozilla/5.0 (radar_bci)"
 
-# Tu perfil de palabras clave (el mismo del radar Entel).
-KEYWORDS = [
-    "voz", "voip", "sip", "carrier", "wholesale", "noc", "redes", "network",
-    "telecom", "infraestructura", "implementacion", "implementación", "core",
-    "ops", "pbx", "trunk", "interconexion", "interconexión", "numeracion",
-    "numeración", "ingenieria", "ingeniería", "sistemas", "routing", "fibra",
-    "soporte tecnico", "soporte técnico",
+# Términos que hacen CALZAR una oferta. IMPORTANTE: se buscan solo en el
+# TÍTULO y el ÁREA del cargo, NO en los requisitos — porque casi todos los
+# cargos del banco piden "Ingeniería Comercial / en Administración", y eso
+# hacía calzar hasta a los ejecutivos y cajeros.
+POSITIVE = [
+    # redes / infraestructura / telecom (tu core)
+    "red", "redes", "network", "networking", "conectividad", "telecom",
+    "voz", "voip", "sip", "noc", "soc", "infraestructura", "datacenter",
+    "data center", "linux", "firewall", "routing", "fibra",
+    # plataforma / cloud / devops
+    "cloud", "nube", "aws", "azure", "gcp", "devops", "sre",
+    "site reliability", "plataforma", "kubernetes", "contenedor",
+    "observabilidad", "monitoreo", "automatizaci",
+    # ingeniería / software / integración / seguridad / datos
+    "ingenier", "software", "developer", "desarrollador", "backend",
+    "back end", "fullstack", "full stack", "integraci", "api",
+    "microservicio", "arquitecto", "technical", "tech lead",
+    "ciberseguridad", "seguridad de la informaci", "seguridad informatica",
+    "datos", "data",
+]
+
+# Si el TÍTULO o el ÁREA contiene alguno de estos, se DESCARTA (ruido comercial).
+NEGATIVE = [
+    "ejecutivo", "ejecutiva", "cajero", "cajera", "comercial", "ventas",
+    "banquero", "factoring", "cuentas", "hipotecari", "sucursal", "cobranza",
+    "seguros", "banca retail", "premier", "preferencial", "servicio clientes",
+    "atencion cliente", "atención cliente",
+]
+
+# Solo para mostrar en la pestaña "Mi perfil".
+KW_DISPLAY = [
+    "redes", "network", "infraestructura", "cloud", "devops", "SRE",
+    "integración", "API", "microservicios", "ciberseguridad", "monitoreo / NOC",
+    "plataforma", "software", "datos", "VoIP / SIP", "telecom",
 ]
 AREAS = [
-    "Carrier wholesale", "VoIP / SIP", "NOC", "Redes / Network",
-    "Implementación", "Infraestructura TI", "Core voz", "Ops fijo / móvil",
+    "Infraestructura & Redes", "Cloud & Plataforma", "DevOps / SRE",
+    "Integración & APIs", "Ciberseguridad", "Datos & Analítica",
+    "Software / Backend", "Monitoreo / NOC",
 ]
 
 CACHE_FILE = "bci_offers_cache.json"
@@ -154,7 +182,11 @@ def normalize(o):
 
 
 def matches_profile(o):
-    return any(kw in o["text"] for kw in KEYWORDS)
+    # Se evalúa SOLO título + área (ahí está la señal limpia).
+    hay = f"{o['title']} {o['dept']}".lower()
+    if any(neg in hay for neg in NEGATIVE):
+        return False
+    return any(pos in hay for pos in POSITIVE)
 
 
 # ----------------------------------------------------------------------
@@ -187,7 +219,7 @@ def build_html(offers, source):
     stamp = datetime.now().strftime("%d-%m-%Y, %I:%M %p").lower()
     para_ti = "".join(_card(o) for o in matched) or '<p class="empty">Sin coincidencias con tu perfil ahora.</p>'
     todas = "".join(_card(o) for o in norm) or '<p class="empty">No se cargaron ofertas.</p>'
-    kw_chips = "".join(f'<span class="kw">{html.escape(k)}</span>' for k in dict.fromkeys(KEYWORDS))
+    kw_chips = "".join(f'<span class="kw">{html.escape(k)}</span>' for k in dict.fromkeys(KW_DISPLAY))
     area_chips = "".join(f'<span class="kw">{html.escape(a)}</span>' for a in AREAS)
     src = "sitio oficial trabajaenbci.cl" if source and source.startswith("http") else html.escape(source or "sin fuente")
 
@@ -274,9 +306,11 @@ def build_html(offers, source):
     <div class="sec">ÁREAS OBJETIVO</div>
     <div>{area_chips}</div>
     <div class="sec">CÓMO FUNCIONA</div>
-    <div class="how">Un proceso automático consulta el portal oficial de <b>trabajaenbci.cl</b>,
-    filtra por tu perfil de palabras clave y publica esta app. Cuando no hay conexión,
-    muestra los datos guardados de la última consulta (caché offline).</div>
+    <div class="how">Un proceso automático consulta el portal oficial de <b>trabajaenbci.cl</b>
+    y arma esta app. En "Para ti" filtra por el <b>título y el área</b> del cargo (no por los
+    requisitos, para no arrastrar cargos comerciales que igual piden "Ingeniería Comercial"),
+    y descarta perfiles de ejecutivo, cajero, sucursal, etc. Sin conexión, muestra los datos
+    guardados de la última consulta (caché offline).</div>
   </div>
 </div>
 <script>
